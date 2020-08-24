@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>133713371337</title>
+    <meta charset="utf-8">
+    <link href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" rel="stylesheet"/>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+<h1>Less than 3 in 2km => green</h1>
+<h1>Less than 6 in 2 km => yellow</h1>
+<h1> Other => red</h1>
+
+<div id="map" style="height: 80vh;"></div>
+
+<script>
+
+const map = L.map('map').setView([55.73135, 37.59104], 10);
+
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  attribution: 'Open street map',
+}).addTo(map);
+
+var greenMarkerOptions = {
+    radius: 8,
+    fillColor: "#3cb043",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+var yellowMarkerOptions = {
+    radius: 8,
+    fillColor: "#fad201",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+var redMarkerOptions = {
+    radius: 8,
+    fillColor: "#ff0033",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+};
+
+
+axios.get('http://127.0.0.1:5000/points')
+  .then((response) => {
+    L.geoJSON(response.data, {
+      pointToLayer: function (feature, latlng) {
+        if (feature.properties.count < 3) {
+          return L.circleMarker(latlng, greenMarkerOptions);
+        }
+        else if (feature.properties.count < 6) {
+          return L.circleMarker(latlng, yellowMarkerOptions);
+        }
+        return L.circleMarker(latlng, redMarkerOptions);
+      },
+    }).addTo(map);
+  });
+
+</script>
+</body>
+</html>
